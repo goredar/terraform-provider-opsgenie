@@ -48,7 +48,7 @@ func resourceOpsGenieTeam() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"id": {
+						"username": {
 							Type:     schema.TypeString,
 							Required: true,
 						},
@@ -201,7 +201,7 @@ func flattenOpsGenieTeamMembers(input []team.Member) []map[string]interface{} {
 	members := make([]map[string]interface{}, 0, len(input))
 	for _, inputMember := range input {
 		outputMember := make(map[string]interface{})
-		outputMember["id"] = inputMember.User.ID
+		outputMember["username"] = inputMember.User.Username
 		outputMember["role"] = inputMember.Role
 		members = append(members, outputMember)
 	}
@@ -220,12 +220,12 @@ func expandOpsGenieTeamMembers(d *schema.ResourceData) []team.Member {
 	for _, v := range input.List() {
 		config := v.(map[string]interface{})
 
-		userId := config["id"].(string)
+		username := config["username"].(string)
 		role := config["role"].(string)
 
 		member := team.Member{
 			User: team.User{
-				ID: userId,
+				Username: username,
 			},
 			Role: role,
 		}

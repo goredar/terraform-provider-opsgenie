@@ -74,6 +74,10 @@ func resourceOpsgenieScheduleRotation() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
+						"username": {
+							Type:     schema.TypeString,
+							Optional: true,
+						},
 					},
 				},
 			},
@@ -259,8 +263,12 @@ func flattenOpsgenieScheduleRotationParticipant(input []og.Participant) []map[st
 	participants := make([]map[string]interface{}, 0, len(input))
 	for _, part := range input {
 		outputMember := make(map[string]interface{})
-		outputMember["id"] = part.Id
 		outputMember["type"] = part.Type
+		if part.Type == og.User {
+			outputMember["username"] = part.Username
+		} else {
+			outputMember["id"] = part.Id
+		}
 		participants = append(participants, outputMember)
 	}
 
@@ -399,10 +407,12 @@ func expandOpsgenieScheduleParticipants(input []interface{}) []og.Participant {
 
 		participantType := config["type"].(string)
 		Id := config["id"].(string)
+		username := config["username"].(string)
 
 		participant := og.Participant{
-			Type: og.ParticipantType(participantType),
-			Id:   Id,
+			Type:     og.ParticipantType(participantType),
+			Id:       Id,
+			Username: username,
 		}
 
 		participants = append(participants, participant)
